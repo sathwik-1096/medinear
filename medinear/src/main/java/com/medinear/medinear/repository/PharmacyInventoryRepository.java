@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface PharmacyInventoryRepository extends JpaRepository<PharmacyInventory, Long> {
 
+
     List<PharmacyInventory> findByPharmacy(Pharmacy pharmacy);
 
     List<PharmacyInventory> findByMedicine(Medicine medicine);

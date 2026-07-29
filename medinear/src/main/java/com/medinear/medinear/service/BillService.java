@@ -1,5 +1,6 @@
 package com.medinear.medinear.service;
 
+import com.medinear.medinear.dto.BillRequestDto;
 import com.medinear.medinear.entity.Bill;
 import com.medinear.medinear.entity.Pharmacy;
 import com.medinear.medinear.entity.User;
@@ -20,4 +21,6 @@ public interface BillService {
     List<Bill> getBillsByPharmacy(Pharmacy pharmacy);
 
     List<Bill> getAllBills();
+
+    Bill generateBill(BillRequestDto request);
 }

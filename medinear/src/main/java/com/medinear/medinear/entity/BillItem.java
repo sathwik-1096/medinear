@@ -93,8 +93,12 @@ public class BillItem {
         this.unitPrice = unitPrice;
     }
 
-    public Double getSubtotal() {
-        return subtotal;
+    @PrePersist
+    @PreUpdate
+    public void calculateSubtotal() {
+        if (quantity != null && unitPrice != null) {
+            subtotal = quantity * unitPrice;
+        }
     }
 
     public void setSubtotal(Double subtotal) {

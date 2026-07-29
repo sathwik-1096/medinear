@@ -2,8 +2,10 @@ package com.medinear.medinear.entity;
 import com.medinear.medinear.entity.User;
 import com.medinear.medinear.entity.BillItem;
 import com.medinear.medinear.entity.Pharmacy;
+import com.medinear.medinear.enums.PaymentMethod;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -43,17 +45,16 @@ public class Bill {
     @Column(name = "final_amount", nullable = false)
     private Double finalAmount;
 
-    @Column(name = "payment_mode", nullable = false, length = 20)
-    private String paymentMode;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_mode", nullable = false)
+    private PaymentMethod paymentMethod;
 
-    @Column(name = "payment_status", nullable = false, length = 20)
-    private String paymentStatus;
 
     // Medicines in this bill
     @OneToMany(mappedBy = "bill",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
-    private List<BillItem> billItems;
+    private List<BillItem> billItems = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
@@ -137,20 +138,12 @@ public class Bill {
         this.finalAmount = finalAmount;
     }
 
-    public String getPaymentMode() {
-        return paymentMode;
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
     }
 
-    public void setPaymentMode(String paymentMode) {
-        this.paymentMode = paymentMode;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public List<BillItem> getBillItems() {

@@ -1,10 +1,12 @@
 package com.medinear.medinear.controller;
 
+import com.medinear.medinear.dto.BillRequestDto;
 import com.medinear.medinear.entity.Bill;
 import com.medinear.medinear.entity.Pharmacy;
 import com.medinear.medinear.entity.User;
 import com.medinear.medinear.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,12 @@ public class BillController {
     @Autowired
     public BillController(BillService billService) {
         this.billService = billService;
+    }
+
+    @PostMapping("/generate")
+    public ResponseEntity<Bill> generateBill(@RequestBody BillRequestDto request) {
+        Bill bill = billService.generateBill(request);
+        return ResponseEntity.ok(bill);
     }
 
     @PostMapping
