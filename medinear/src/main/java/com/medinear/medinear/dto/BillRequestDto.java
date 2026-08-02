@@ -1,21 +1,32 @@
 package com.medinear.medinear.dto;
 
 import com.medinear.medinear.enums.PaymentMethod;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.List;
 
 public class BillRequestDto {
 
+    @NotNull(message = "Customer id is required")
     private Long customerId;
 
+    @NotNull(message = "Pharmacy id is required")
     private Long pharmacyId;
 
+    @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
 
+    @PositiveOrZero(message = "Discount cannot be negative")
     private Double discount;
 
+    @PositiveOrZero(message = "Tax cannot be negative")
     private Double tax;
 
+    @Valid
+    @NotEmpty(message = "Bill must contain at least one medicine")
     private List<BillItemRequestDto> items;
 
     public BillRequestDto() {

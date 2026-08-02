@@ -1,16 +1,15 @@
 package com.medinear.medinear.controller;
 
 import com.medinear.medinear.dto.BillRequestDto;
+import com.medinear.medinear.dto.BillResponseDto;
 import com.medinear.medinear.entity.Bill;
-import com.medinear.medinear.entity.Pharmacy;
-import com.medinear.medinear.entity.User;
 import com.medinear.medinear.service.BillService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bills")
@@ -24,38 +23,50 @@ public class BillController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<Bill> generateBill(@RequestBody BillRequestDto request) {
-        Bill bill = billService.generateBill(request);
-        return ResponseEntity.ok(bill);
+    public ResponseEntity<BillResponseDto> generateBill(
+            @Valid @RequestBody BillRequestDto request) {
+
+        return ResponseEntity.ok(
+                billService.generateBill(request));
     }
 
-    @PostMapping
-    public Bill createBill(@RequestBody Bill bill) {
-        return billService.createBill(bill);
-    }
 
     @GetMapping("/{id}")
-    public Optional<Bill> getBillById(@PathVariable Long id) {
-        return billService.getBillById(id);
+    public ResponseEntity<BillResponseDto> getBillById(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                billService.getBillById(id));
     }
 
     @GetMapping("/number/{billNumber}")
-    public Optional<Bill> getBillByBillNumber(@PathVariable String billNumber) {
-        return billService.getBillByBillNumber(billNumber);
+    public ResponseEntity<BillResponseDto> getBillByBillNumber(
+            @PathVariable String billNumber) {
+
+        return ResponseEntity.ok(
+                billService.getBillByBillNumber(billNumber));
     }
 
-    @GetMapping("/user")
-    public List<Bill> getBillsByUser(@RequestBody User user) {
-        return billService.getBillsByUser(user);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BillResponseDto>> getBillsByUser(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                billService.getBillsByUser(userId));
     }
 
-    @GetMapping("/pharmacy")
-    public List<Bill> getBillsByPharmacy(@RequestBody Pharmacy pharmacy) {
-        return billService.getBillsByPharmacy(pharmacy);
+    @GetMapping("/pharmacy/{pharmacyId}")
+    public ResponseEntity<List<BillResponseDto>> getBillsByPharmacy(
+            @PathVariable Long pharmacyId) {
+
+        return ResponseEntity.ok(
+                billService.getBillsByPharmacy(pharmacyId));
     }
 
     @GetMapping
-    public List<Bill> getAllBills() {
-        return billService.getAllBills();
+    public ResponseEntity<List<BillResponseDto>> getAllBills() {
+
+        return ResponseEntity.ok(
+                billService.getAllBills());
     }
 }

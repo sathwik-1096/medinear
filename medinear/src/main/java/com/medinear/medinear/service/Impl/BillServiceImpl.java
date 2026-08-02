@@ -1,12 +1,19 @@
 package com.medinear.medinear.service.Impl;
 
 import com.medinear.medinear.dto.BillItemRequestDto;
+import com.medinear.medinear.dto.BillItemResponseDto;
 import com.medinear.medinear.dto.BillRequestDto;
+import com.medinear.medinear.dto.BillResponseDto;
 import com.medinear.medinear.entity.*;
+import com.medinear.medinear.exception.BadRequestException;
+import com.medinear.medinear.exception.ResourceNotFoundException;
+import com.medinear.medinear.mapper.BillMapper;
 import com.medinear.medinear.repository.*;
 import com.medinear.medinear.service.BillService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,39 +47,84 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Optional<Bill> getBillById(Long id) {
-        return billRepository.findById(id);
+    public BillResponseDto getBillById(Long id) {
+
+        Bill bill = billRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Bill not found"));
+        // Convert Bill -> BillResponseDto
+        return BillMapper.toResponseDto(bill);
     }
 
     @Override
-    public Optional<Bill> getBillByBillNumber(String billNumber) {
-        return billRepository.findByBillNumber(billNumber);
+    public BillResponseDto getBillByBillNumber(String billNumber) {
+
+        Bill bill = billRepository.findByBillNumber(billNumber)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Bill not found"));
+
+        return BillMapper.toResponseDto(bill);
     }
 
     @Override
-    public List<Bill> getBillsByUser(User user) {
-        return billRepository.findByUser(user);
+    public List<BillResponseDto> getBillsByUser(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        List<Bill> bills = billRepository.findByUser(user);
+
+        List<BillResponseDto> responses = new ArrayList<>();
+
+        for (Bill bill : bills) {
+            responses.add(BillMapper.toResponseDto(bill));
+        }
+
+        return responses;
     }
 
     @Override
-    public List<Bill> getBillsByPharmacy(Pharmacy pharmacy) {
-        return billRepository.findByPharmacy(pharmacy);
+    public List<BillResponseDto> getBillsByPharmacy(Long pharmacyId) {
+
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Pharmacy not found"));
+
+        List<Bill> bills = billRepository.findByPharmacy(pharmacy);
+
+        List<BillResponseDto> responses = new ArrayList<>();
+
+        for (Bill bill : bills) {
+            responses.add(BillMapper.toResponseDto(bill));
+        }
+
+        return responses;
     }
 
     @Override
-    public List<Bill> getAllBills() {
-        return billRepository.findAll();
+    public List<BillResponseDto> getAllBills() {
+
+        List<Bill> bills = billRepository.findAll();
+
+        List<BillResponseDto> responses = new ArrayList<>();
+
+        for (Bill bill : bills) {
+            responses.add(BillMapper.toResponseDto(bill));
+        }
+
+        return responses;
     }
 
     @Override
     @Transactional
-    public Bill generateBill(BillRequestDto request) {
+    public BillResponseDto generateBill(BillRequestDto request) {
 
         User customer = userRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Pharmacy pharmacy = pharmacyRepository.findById(request.getPharmacyId())
-                .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Pharmacy not found"));
 
         Bill bill = new Bill();
 
@@ -80,6 +132,8 @@ public class BillServiceImpl implements BillService {
         bill.setPharmacy(pharmacy);
         bill.setPaymentMethod(request.getPaymentMethod());
 
+
+        bill.setBillItems(new ArrayList<>());
         // ↓↓↓ Write it here ↓↓↓
 
         double totalAmount = 0.0;
@@ -88,16 +142,17 @@ public class BillServiceImpl implements BillService {
 
             // Find medicine
             Medicine medicine = medicineRepository.findById(itemRequest.getMedicineId())
-                    .orElseThrow(() -> new RuntimeException("Medicine not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Medicine not found"));
 
             // Find medicine in pharmacy inventory
             PharmacyInventory inventory = pharmacyInventoryRepository
                     .findByPharmacyAndMedicine(pharmacy, medicine)
-                    .orElseThrow(() -> new RuntimeException("Medicine not available in this pharmacy"));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Medicine not available in this pharmacy"));
 
             // Check stock
             if (inventory.getAvailableQuantity() < itemRequest.getQuantity()) {
-                throw new RuntimeException(
+                throw new BadRequestException(
                         medicine.getMedicineName() + " is out of stock or insufficient quantity."
                 );
             }
@@ -139,6 +194,7 @@ public class BillServiceImpl implements BillService {
 // Generate bill number (simple example)
         bill.setBillNumber("MED-" + System.currentTimeMillis());
 
-        return billRepository.save(bill);
+       Bill savedBill = billRepository.save(bill);
+       return BillMapper.toResponseDto(savedBill);
     }
 }

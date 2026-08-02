@@ -1,26 +1,26 @@
 package com.medinear.medinear.service;
 
 import com.medinear.medinear.dto.BillRequestDto;
+import com.medinear.medinear.dto.BillResponseDto;
 import com.medinear.medinear.entity.Bill;
 import com.medinear.medinear.entity.Pharmacy;
 import com.medinear.medinear.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BillService {
 
     Bill createBill(Bill bill);
 
-    Optional<Bill> getBillById(Long id);
+    BillResponseDto getBillById(Long id);
 
-    Optional<Bill> getBillByBillNumber(String billNumber);
+    BillResponseDto getBillByBillNumber(String billNumber);
 
-    List<Bill> getBillsByUser(User user);
+    List<BillResponseDto> getBillsByUser(Long userId);
 
-    List<Bill> getBillsByPharmacy(Pharmacy pharmacy);
+    List<BillResponseDto> getBillsByPharmacy(Long pharmacyId);
 
-    List<Bill> getAllBills();
+    List<BillResponseDto> getAllBills();
 
-    Bill generateBill(BillRequestDto request);
+    BillResponseDto generateBill(BillRequestDto request);
 }

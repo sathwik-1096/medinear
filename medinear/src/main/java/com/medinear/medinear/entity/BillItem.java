@@ -104,4 +104,9 @@ public class BillItem {
     public void setSubtotal(Double subtotal) {
         this.subtotal = subtotal;
     }
+
+    public Double getSubtotal() {
+        return subtotal;
+    }
+
 }
