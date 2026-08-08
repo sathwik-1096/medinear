@@ -22,7 +22,7 @@ public class BillController {
         this.billService = billService;
     }
 
-    @PostMapping("/generate")
+    @PostMapping
     public ResponseEntity<BillResponseDto> generateBill(
             @Valid @RequestBody BillRequestDto request) {
 
@@ -64,9 +64,13 @@ public class BillController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BillResponseDto>> getAllBills() {
+    public List<BillResponseDto> getAllBills() {
+        return billService.getAllBills();
+    }
 
-        return ResponseEntity.ok(
-                billService.getAllBills());
+    @DeleteMapping("/{id}")
+    public void deleteBill(@PathVariable Long id) {
+
+        billService.deleteBill(id);
     }
 }

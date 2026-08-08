@@ -23,6 +23,10 @@ public class BillItem {
     @JoinColumn(name = "medicine_id", nullable = false)
     private Medicine medicine;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inventory_id", nullable = false)
+    private PharmacyInventory inventory;
+
     // Quantity sold
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
@@ -107,6 +111,14 @@ public class BillItem {
 
     public Double getSubtotal() {
         return subtotal;
+    }
+
+    public PharmacyInventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(PharmacyInventory inventory) {
+        this.inventory = inventory;
     }
 
 }

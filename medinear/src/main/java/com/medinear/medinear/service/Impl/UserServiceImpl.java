@@ -26,33 +26,45 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(User user) {
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        if (userRepository.existsByPhoneNumber(user.getPhoneNumber())) {
+            throw new RuntimeException("Phone number already exists");
+        }
+
         return userRepository.save(user);
     }
 
     @Override
     public User updateUser(Long id, User user) {
+
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        existingUser.setFullName(user.getFullName());
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(user.getPassword());
         existingUser.setPhoneNumber(user.getPhoneNumber());
         existingUser.setRole(user.getRole());
-
         return userRepository.save(existingUser);
     }
 
     @Override
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
 
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        userRepository.delete(user);
+    }
     @Override
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
-
     @Override
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);

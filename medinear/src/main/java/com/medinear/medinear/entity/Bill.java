@@ -2,6 +2,7 @@ package com.medinear.medinear.entity;
 import com.medinear.medinear.entity.User;
 import com.medinear.medinear.entity.BillItem;
 import com.medinear.medinear.entity.Pharmacy;
+import com.medinear.medinear.enums.BillStatus;
 import com.medinear.medinear.enums.PaymentMethod;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -60,6 +61,10 @@ public class Bill {
     public void prePersist() {
         this.billDate = LocalDateTime.now();
     }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    private BillStatus billStatus;
 
     public Bill() {
     }
@@ -152,5 +157,13 @@ public class Bill {
 
     public void setBillItems(List<BillItem> billItems) {
         this.billItems = billItems;
+    }
+
+    public BillStatus getBillStatus() {
+        return billStatus;
+    }
+
+    public void setBillStatus(BillStatus billStatus) {
+        this.billStatus = billStatus;
     }
 }

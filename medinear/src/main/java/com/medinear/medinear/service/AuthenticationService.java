@@ -6,7 +6,13 @@ import com.medinear.medinear.dto.RegisterRequestDto;
 
 public interface AuthenticationService {
 
-    LoginResponseDto register(RegisterRequestDto request);
+    LoginResponseDto registerConsumer(RegisterRequestDto request);
 
-    LoginResponseDto login(LoginRequestDto request);
+    LoginResponseDto registerOwner(RegisterRequestDto request);
+
+    LoginResponseDto loginConsumer(LoginRequestDto request);
+
+    LoginResponseDto loginOwner(LoginRequestDto request);
+
+    LoginResponseDto loginAdmin(LoginRequestDto request);
 }

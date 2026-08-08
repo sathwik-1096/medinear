@@ -19,4 +19,7 @@ public interface PharmacyInventoryRepository extends JpaRepository<PharmacyInven
             Pharmacy pharmacy,
             Medicine medicine
     );
+
+    List<PharmacyInventory>
+    findByMedicine_MedicineNameContainingIgnoreCase(String medicineName);
 }

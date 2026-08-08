@@ -1,11 +1,13 @@
 package com.medinear.medinear.entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import com.medinear.medinear.entity.PharmacyInventory;
 import com.medinear.medinear.entity.BillItem;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "medicines")
 public class Medicine {
@@ -30,13 +32,15 @@ public class Medicine {
     @OneToMany(mappedBy = "medicine",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
-    private List<PharmacyInventory> inventory;
+    @JsonIgnore
+    private List<PharmacyInventory> inventory = new ArrayList<>();
 
     // Sold in different bills
     @OneToMany(mappedBy = "medicine",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
-    private List<BillItem> billItems;
+    @JsonIgnore
+    private List<BillItem> billItems = new ArrayList<>();
 
     public Medicine() {
     }

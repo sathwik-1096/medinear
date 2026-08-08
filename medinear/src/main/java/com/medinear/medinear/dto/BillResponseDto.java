@@ -7,37 +7,35 @@ import java.util.List;
 
 public class BillResponseDto {
 
-    private Long billId;
-
+    private Long id;
     private String billNumber;
 
-    private String customerName;
+    private Long customerId;
+    private String customerEmail;
 
+    private Long pharmacyId;
     private String pharmacyName;
 
     private LocalDateTime billDate;
 
-    private PaymentMethod paymentMethod;
-
     private Double totalAmount;
-
     private Double discount;
-
     private Double tax;
-
     private Double finalAmount;
+
+    private PaymentMethod paymentMethod;
 
     private List<BillItemResponseDto> items;
 
     public BillResponseDto() {
     }
 
-    public Long getBillId() {
-        return billId;
+    public Long getId() {
+        return id;
     }
 
-    public void setBillId(Long billId) {
-        this.billId = billId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getBillNumber() {
@@ -48,12 +46,28 @@ public class BillResponseDto {
         this.billNumber = billNumber;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public Long getPharmacyId() {
+        return pharmacyId;
+    }
+
+    public void setPharmacyId(Long pharmacyId) {
+        this.pharmacyId = pharmacyId;
     }
 
     public String getPharmacyName() {
@@ -70,14 +84,6 @@ public class BillResponseDto {
 
     public void setBillDate(LocalDateTime billDate) {
         this.billDate = billDate;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
     }
 
     public Double getTotalAmount() {
@@ -110,6 +116,14 @@ public class BillResponseDto {
 
     public void setFinalAmount(Double finalAmount) {
         this.finalAmount = finalAmount;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public List<BillItemResponseDto> getItems() {

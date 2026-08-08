@@ -40,7 +40,12 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Override
     public void deleteMedicine(Long id) {
-        medicineRepository.deleteById(id);
+
+        Medicine medicine = medicineRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Medicine not found"));
+
+        medicineRepository.delete(medicine);
     }
 
     @Override
@@ -49,7 +54,7 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
-    public Optional<Medicine> getMedicineByName(String medicineName) {
+    public List<Medicine> getMedicineByName(String medicineName) {
         return medicineRepository.findByMedicineNameIgnoreCase(medicineName);
     }
 

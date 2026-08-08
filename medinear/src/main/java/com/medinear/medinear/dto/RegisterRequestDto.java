@@ -1,14 +1,16 @@
 package com.medinear.medinear.dto;
 
-import com.medinear.medinear.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class RegisterRequestDto {
 
-    @NotBlank(message = "Full name is required")
-    private String fullName;
+    @NotBlank(message = "First name is required")
+    private String firstName;
+
+    @NotBlank(message = "Last name is required")
+    private String lastName;
 
     @Email(message = "Invalid email")
     @NotBlank(message = "Email is required")
@@ -20,18 +22,24 @@ public class RegisterRequestDto {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
-    @NotNull(message = "Role is required")
-    private Role role;
 
     public RegisterRequestDto() {
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -56,13 +64,5 @@ public class RegisterRequestDto {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 }

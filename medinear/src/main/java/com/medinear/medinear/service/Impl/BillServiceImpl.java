@@ -151,6 +151,13 @@ public class BillServiceImpl implements BillService {
                             "Medicine not available in this pharmacy"));
 
             // Check stock
+            if (itemRequest.getQuantity() == null ||
+                    itemRequest.getQuantity() <= 0) {
+
+                throw new BadRequestException(
+                        "Quantity must be greater than zero");
+            }
+
             if (inventory.getAvailableQuantity() < itemRequest.getQuantity()) {
                 throw new BadRequestException(
                         medicine.getMedicineName() + " is out of stock or insufficient quantity."
@@ -159,8 +166,10 @@ public class BillServiceImpl implements BillService {
 
             // Create BillItem
             BillItem billItem = new BillItem();
+
             billItem.setBill(bill);
             billItem.setMedicine(medicine);
+            billItem.setInventory(inventory);
             billItem.setQuantity(itemRequest.getQuantity());
             billItem.setUnit(inventory.getUnit());
             billItem.setUnitPrice(inventory.getPrice());
@@ -197,4 +206,17 @@ public class BillServiceImpl implements BillService {
        Bill savedBill = billRepository.save(bill);
        return BillMapper.toResponseDto(savedBill);
     }
+    @Override
+    public void deleteBill(Long id) {
+
+
+        Bill bill = billRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Bill not found"));
+
+        billRepository.delete(bill);
+
+
+    }
+
 }

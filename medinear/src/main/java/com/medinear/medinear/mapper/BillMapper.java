@@ -14,30 +14,56 @@ public class BillMapper {
 
         BillResponseDto response = new BillResponseDto();
 
-        response.setBillId(bill.getId());
+        response.setId(bill.getId());
         response.setBillNumber(bill.getBillNumber());
-        response.setCustomerName(bill.getUser().getFullName());
-        response.setPharmacyName(bill.getPharmacy().getPharmacyName());
+
+        if (bill.getUser() != null) {
+            response.setCustomerId(bill.getUser().getId());
+            response.setCustomerEmail(bill.getUser().getEmail());
+        }
+
+        if (bill.getPharmacy() != null) {
+            response.setPharmacyId(bill.getPharmacy().getId());
+            response.setPharmacyName(
+                    bill.getPharmacy().getPharmacyName());
+        }
+
         response.setBillDate(bill.getBillDate());
-        response.setPaymentMethod(bill.getPaymentMethod());
         response.setTotalAmount(bill.getTotalAmount());
         response.setDiscount(bill.getDiscount());
         response.setTax(bill.getTax());
         response.setFinalAmount(bill.getFinalAmount());
+        response.setPaymentMethod(bill.getPaymentMethod());
 
         List<BillItemResponseDto> items = new ArrayList<>();
 
-        for (BillItem item : bill.getBillItems()) {
+        for (BillItem billItem : bill.getBillItems()) {
 
-            BillItemResponseDto dto = new BillItemResponseDto();
+            BillItemResponseDto item =
+                    new BillItemResponseDto();
 
-            dto.setMedicineName(item.getMedicine().getMedicineName());
-            dto.setQuantity(item.getQuantity());
-            dto.setUnit(item.getUnit());
-            dto.setUnitPrice(item.getUnitPrice());
-            dto.setSubtotal(item.getSubtotal());
+            item.setMedicineId(
+                    billItem.getMedicine().getId());
 
-            items.add(dto);
+            item.setMedicineName(
+                    billItem.getMedicine().getMedicineName());
+
+            item.setManufacturer(
+                    billItem.getMedicine().getManufacturer());
+
+            item.setQuantity(
+                    billItem.getQuantity());
+
+            item.setUnit(
+                    billItem.getUnit());
+
+            item.setUnitPrice(
+                    billItem.getUnitPrice());
+
+            item.setSubtotal(
+                    billItem.getSubtotal());
+
+            items.add(item);
         }
 
         response.setItems(items);

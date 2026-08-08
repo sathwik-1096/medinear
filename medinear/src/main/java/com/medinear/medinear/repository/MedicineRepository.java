@@ -8,9 +8,11 @@ import java.util.Optional;
 
 public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
-    Optional<Medicine> findByMedicineNameIgnoreCase(String medicineName);
+    List<Medicine> findByMedicineNameIgnoreCase(String medicineName);
 
     List<Medicine> findByMedicineNameContainingIgnoreCase(String medicineName);
 
-    List<Medicine> findByManufacturerContainingIgnoreCase(String manufacturer);
+    List<Medicine> findByCategoryIgnoreCase(String category);
+
+    List<Medicine> findByManufacturerIgnoreCase(String manufacturer);
 }

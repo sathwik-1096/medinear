@@ -7,7 +7,6 @@ import com.medinear.medinear.service.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
@@ -18,19 +17,38 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<LoginResponseDto> register(
+    @PostMapping("/user/register")
+    public ResponseEntity<LoginResponseDto> registerUser(
             @Valid @RequestBody RegisterRequestDto request) {
 
-        return ResponseEntity.ok(
-                authenticationService.register(request));
+        return ResponseEntity.ok(authenticationService.registerConsumer(request));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(
+    @PostMapping("/owner/register")
+    public ResponseEntity<LoginResponseDto> registerOwner(
+            @Valid @RequestBody RegisterRequestDto request) {
+
+        return ResponseEntity.ok(authenticationService.registerOwner(request));
+    }
+
+    @PostMapping("/user/login")
+    public ResponseEntity<LoginResponseDto> loginUser(
             @Valid @RequestBody LoginRequestDto request) {
 
-        return ResponseEntity.ok(
-                authenticationService.login(request));
+        return ResponseEntity.ok(authenticationService.loginConsumer(request));
+    }
+
+    @PostMapping("/owner/login")
+    public ResponseEntity<LoginResponseDto> loginOwner(
+            @Valid @RequestBody LoginRequestDto request) {
+
+        return ResponseEntity.ok(authenticationService.loginOwner(request));
+    }
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<LoginResponseDto> loginAdmin(
+            @Valid @RequestBody LoginRequestDto request) {
+
+        return ResponseEntity.ok(authenticationService.loginAdmin(request));
     }
 }

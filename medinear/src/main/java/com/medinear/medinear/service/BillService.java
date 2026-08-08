@@ -3,8 +3,6 @@ package com.medinear.medinear.service;
 import com.medinear.medinear.dto.BillRequestDto;
 import com.medinear.medinear.dto.BillResponseDto;
 import com.medinear.medinear.entity.Bill;
-import com.medinear.medinear.entity.Pharmacy;
-import com.medinear.medinear.entity.User;
 
 import java.util.List;
 
@@ -23,4 +21,8 @@ public interface BillService {
     List<BillResponseDto> getAllBills();
 
     BillResponseDto generateBill(BillRequestDto request);
+
+    void deleteBill(Long id);
+
+
 }

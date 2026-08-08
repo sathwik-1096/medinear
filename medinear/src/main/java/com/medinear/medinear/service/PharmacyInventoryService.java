@@ -17,12 +17,15 @@ public interface PharmacyInventoryService {
 
     Optional<PharmacyInventory> getInventoryById(Long id);
 
-    List<PharmacyInventory> getInventoryByPharmacy(Pharmacy pharmacy);
+    List<PharmacyInventory> getInventoryByPharmacy(Long pharmacyId);
 
-    List<PharmacyInventory> getInventoryByMedicine(Medicine medicine);
+    List<PharmacyInventory> getInventoryByMedicine(Long medicineId);
 
     Optional<PharmacyInventory> getInventoryByPharmacyAndMedicine(
-            Pharmacy pharmacy,
-            Medicine medicine
+            Long pharmacy,
+            Long medicine
     );
+
+    List<PharmacyInventory> searchInventoryByMedicineName(
+            String medicineName);
 }

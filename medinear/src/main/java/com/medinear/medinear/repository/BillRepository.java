@@ -15,4 +15,6 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
     List<Bill> findByPharmacy(Pharmacy pharmacy);
 
     Optional<Bill> findByBillNumber(String billNumber);
+
+    boolean existsByBillNumber(String billNumber);
 }

@@ -21,4 +21,5 @@ public interface PharmacyService {
     List<Pharmacy> getPharmaciesByOwner(User owner);
 
     List<Pharmacy> searchPharmacyByName(String pharmacyName);
+
 }

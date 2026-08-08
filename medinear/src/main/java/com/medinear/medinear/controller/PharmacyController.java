@@ -35,11 +35,6 @@ public class PharmacyController {
         return pharmacyService.getAllPharmacies();
     }
 
-    @GetMapping("/owner/{ownerId}")
-    public List<Pharmacy> getPharmaciesByOwner(@PathVariable User ownerId) {
-        return pharmacyService.getPharmaciesByOwner(ownerId);
-    }
-
     @GetMapping("/search/{name}")
     public List<Pharmacy> searchPharmacyByName(@PathVariable String name) {
         return pharmacyService.searchPharmacyByName(name);

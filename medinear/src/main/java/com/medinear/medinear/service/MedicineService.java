@@ -15,7 +15,7 @@ public interface MedicineService {
 
     Optional<Medicine> getMedicineById(Long id);
 
-    Optional<Medicine> getMedicineByName(String medicineName);
+    List<Medicine> getMedicineByName(String medicineName);
 
     List<Medicine> getAllMedicines();
 

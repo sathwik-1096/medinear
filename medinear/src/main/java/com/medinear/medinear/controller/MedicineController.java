@@ -30,7 +30,7 @@ public class MedicineController {
     }
 
     @GetMapping("/name/{name}")
-    public Optional<Medicine> getMedicineByName(@PathVariable String name) {
+    public List<Medicine> getMedicineByName(@PathVariable String name) {
         return medicineService.getMedicineByName(name);
     }
 

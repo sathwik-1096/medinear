@@ -5,6 +5,10 @@ import com.medinear.medinear.entity.User;
 import com.medinear.medinear.repository.PharmacyRepository;
 import com.medinear.medinear.service.PharmacyService;
 import org.springframework.stereotype.Service;
+import com.medinear.medinear.enums.Role;
+import com.medinear.medinear.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,14 +18,41 @@ public class PharmacyServiceImpl implements PharmacyService {
 
     private final PharmacyRepository pharmacyRepository;
 
-    public PharmacyServiceImpl(PharmacyRepository pharmacyRepository) {
-        this.pharmacyRepository = pharmacyRepository;
-    }
+    private final UserRepository userRepository;
 
-    // Implement methods here
+    public PharmacyServiceImpl(
+            PharmacyRepository pharmacyRepository,
+            UserRepository userRepository) {
+
+        this.pharmacyRepository = pharmacyRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public Pharmacy addPharmacy(Pharmacy pharmacy) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        System.out.println("AUTHENTICATED USER = " + email);
+
+        User owner = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Owner not found"));
+
+        System.out.println("OWNER ID = " + owner.getId());
+        System.out.println("OWNER ROLE = " + owner.getRole());
+
+        if (owner.getRole() != Role.OWNER) {
+            throw new RuntimeException(
+                    "Only pharmacy owners can add a pharmacy"
+            );
+        }
+
+        pharmacy.setOwner(owner);
+
         return pharmacyRepository.save(pharmacy);
     }
 
@@ -29,22 +60,33 @@ public class PharmacyServiceImpl implements PharmacyService {
     public Pharmacy updatePharmacy(Long id, Pharmacy pharmacy) {
 
         Pharmacy existingPharmacy = pharmacyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Pharmacy not found"));
 
         existingPharmacy.setPharmacyName(pharmacy.getPharmacyName());
+        existingPharmacy.setLicenseNumber(pharmacy.getLicenseNumber());
+        existingPharmacy.setPhoneNumber(pharmacy.getPhoneNumber());
+        existingPharmacy.setEmail(pharmacy.getEmail());
         existingPharmacy.setAddress(pharmacy.getAddress());
+        existingPharmacy.setCity(pharmacy.getCity());
+        existingPharmacy.setState(pharmacy.getState());
+        existingPharmacy.setPincode(pharmacy.getPincode());
         existingPharmacy.setLatitude(pharmacy.getLatitude());
         existingPharmacy.setLongitude(pharmacy.getLongitude());
         existingPharmacy.setOpeningTime(pharmacy.getOpeningTime());
         existingPharmacy.setClosingTime(pharmacy.getClosingTime());
-        existingPharmacy.setOwner(pharmacy.getOwner());
 
         return pharmacyRepository.save(existingPharmacy);
     }
 
     @Override
     public void deletePharmacy(Long id) {
-        pharmacyRepository.deleteById(id);
+
+        Pharmacy pharmacy = pharmacyRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Pharmacy not found"));
+
+        pharmacyRepository.delete(pharmacy);
     }
 
     @Override
@@ -64,6 +106,7 @@ public class PharmacyServiceImpl implements PharmacyService {
 
     @Override
     public List<Pharmacy> searchPharmacyByName(String pharmacyName) {
-        return pharmacyRepository.findByPharmacyNameContainingIgnoreCase(pharmacyName);
+        return pharmacyRepository
+                .findByPharmacyNameContainingIgnoreCase(pharmacyName);
     }
 }

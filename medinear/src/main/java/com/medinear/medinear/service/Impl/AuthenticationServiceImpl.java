@@ -4,6 +4,7 @@ import com.medinear.medinear.dto.LoginRequestDto;
 import com.medinear.medinear.dto.LoginResponseDto;
 import com.medinear.medinear.dto.RegisterRequestDto;
 import com.medinear.medinear.entity.User;
+import com.medinear.medinear.enums.Role;
 import com.medinear.medinear.exception.BadRequestException;
 import com.medinear.medinear.repository.UserRepository;
 import com.medinear.medinear.security.JwtService;
@@ -34,7 +35,34 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public LoginResponseDto register(RegisterRequestDto request) {
+    public LoginResponseDto registerConsumer(RegisterRequestDto request) {
+        return register(request, Role.CONSUMER);
+    }
+
+    @Override
+    public LoginResponseDto registerOwner(RegisterRequestDto request) {
+        return register(request, Role.OWNER);
+    }
+
+
+    @Override
+    public LoginResponseDto loginConsumer(LoginRequestDto request) {
+        return login(request, Role.CONSUMER);
+    }
+
+    @Override
+    public LoginResponseDto loginOwner(LoginRequestDto request) {
+        return login(request, Role.OWNER);
+    }
+
+    @Override
+    public LoginResponseDto loginAdmin(LoginRequestDto request) {
+        return login(request, Role.ADMIN);
+    }
+
+    private LoginResponseDto register(
+            RegisterRequestDto request,
+            Role role) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already exists");
@@ -46,14 +74,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         User user = new User();
 
-        user.setFullName(request.getFullName());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
 
         // Encrypt password
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setRole(request.getRole());
+        user.setRole(role);
 
         userRepository.save(user);
 
@@ -65,8 +94,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 user.getRole().name()
         );
     }
-    @Override
-    public LoginResponseDto login(LoginRequestDto request) {
+    private LoginResponseDto login(
+            LoginRequestDto request,
+            Role expectedRole) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -79,6 +109,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() ->
                         new BadRequestException("Invalid email or password"));
 
+        if (user.getRole() != expectedRole) {
+            throw new BadRequestException(
+                    "Please login through the correct portal."
+            );
+        }
         String token = jwtService.generateToken(user.getEmail());
 
         return new LoginResponseDto(
