@@ -1,5 +1,6 @@
 package com.medinear.medinear.service;
 
+import com.medinear.medinear.dto.NearbyPharmacyResponseDto;
 import com.medinear.medinear.entity.Pharmacy;
 import com.medinear.medinear.entity.User;
 
@@ -21,5 +22,10 @@ public interface PharmacyService {
     List<Pharmacy> getPharmaciesByOwner(User owner);
 
     List<Pharmacy> searchPharmacyByName(String pharmacyName);
+
+    List<NearbyPharmacyResponseDto> findNearbyPharmacies(
+            double latitude,
+            double longitude,
+            double radiusInKm);
 
 }

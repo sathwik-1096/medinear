@@ -1,5 +1,6 @@
 package com.medinear.medinear.controller;
 
+import com.medinear.medinear.dto.NearbyPharmacyResponseDto;
 import com.medinear.medinear.entity.Pharmacy;
 import com.medinear.medinear.entity.User;
 import com.medinear.medinear.service.PharmacyService;
@@ -25,7 +26,7 @@ public class PharmacyController {
         return pharmacyService.addPharmacy(pharmacy);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public Optional<Pharmacy> getPharmacyById(@PathVariable Long id) {
         return pharmacyService.getPharmacyById(id);
     }
@@ -49,5 +50,18 @@ public class PharmacyController {
     @DeleteMapping("/{id}")
     public void deletePharmacy(@PathVariable Long id) {
         pharmacyService.deletePharmacy(id);
+    }
+
+    @GetMapping("/nearby")
+    public List<NearbyPharmacyResponseDto> getNearbyPharmacies(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam(defaultValue = "5") double radius) {
+
+        return pharmacyService.findNearbyPharmacies(
+                latitude,
+                longitude,
+                radius
+        );
     }
 }

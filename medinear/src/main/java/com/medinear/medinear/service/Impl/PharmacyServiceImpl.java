@@ -1,5 +1,6 @@
 package com.medinear.medinear.service.Impl;
 
+import com.medinear.medinear.dto.NearbyPharmacyResponseDto;
 import com.medinear.medinear.entity.Pharmacy;
 import com.medinear.medinear.entity.User;
 import com.medinear.medinear.repository.PharmacyRepository;
@@ -10,6 +11,8 @@ import com.medinear.medinear.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +66,23 @@ public class PharmacyServiceImpl implements PharmacyService {
                 .orElseThrow(() ->
                         new RuntimeException("Pharmacy not found"));
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User loggedInUser = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        // Check ownership
+        if (!existingPharmacy.getOwner().getId()
+                .equals(loggedInUser.getId())) {
+
+            throw new RuntimeException(
+                    "You are not allowed to update this pharmacy");
+        }
+
         existingPharmacy.setPharmacyName(pharmacy.getPharmacyName());
         existingPharmacy.setLicenseNumber(pharmacy.getLicenseNumber());
         existingPharmacy.setPhoneNumber(pharmacy.getPhoneNumber());
@@ -86,6 +106,22 @@ public class PharmacyServiceImpl implements PharmacyService {
                 .orElseThrow(() ->
                         new RuntimeException("Pharmacy not found"));
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User loggedInUser = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        if (!pharmacy.getOwner().getId()
+                .equals(loggedInUser.getId())) {
+
+            throw new RuntimeException(
+                    "You are not allowed to delete this pharmacy");
+        }
+
         pharmacyRepository.delete(pharmacy);
     }
 
@@ -108,5 +144,87 @@ public class PharmacyServiceImpl implements PharmacyService {
     public List<Pharmacy> searchPharmacyByName(String pharmacyName) {
         return pharmacyRepository
                 .findByPharmacyNameContainingIgnoreCase(pharmacyName);
+    }
+
+    @Override
+    public List<NearbyPharmacyResponseDto> findNearbyPharmacies(
+            double latitude,
+            double longitude,
+            double radiusInKm) {
+
+        List<Pharmacy> pharmacies = pharmacyRepository.findAll();
+
+        List<NearbyPharmacyResponseDto> nearbyPharmacies =
+                new ArrayList<>();
+
+        for (Pharmacy pharmacy : pharmacies) {
+
+            double distance = calculateDistance(
+                    latitude,
+                    longitude,
+                    pharmacy.getLatitude(),
+                    pharmacy.getLongitude()
+            );
+
+            if (distance <= radiusInKm) {
+
+                NearbyPharmacyResponseDto dto =
+                        new NearbyPharmacyResponseDto();
+
+                dto.setId(pharmacy.getId());
+                dto.setPharmacyName(pharmacy.getPharmacyName());
+                dto.setAddress(pharmacy.getAddress());
+                dto.setCity(pharmacy.getCity());
+                dto.setState(pharmacy.getState());
+                dto.setPincode(pharmacy.getPincode());
+                dto.setPhoneNumber(pharmacy.getPhoneNumber());
+                dto.setLatitude(pharmacy.getLatitude());
+                dto.setLongitude(pharmacy.getLongitude());
+
+                dto.setDistanceInKm(
+                        Math.round(distance * 100.0) / 100.0
+                );
+
+                nearbyPharmacies.add(dto);
+            }
+        }
+
+        // Closest pharmacy first
+        nearbyPharmacies.sort(
+                Comparator.comparing(
+                        NearbyPharmacyResponseDto::getDistanceInKm
+                )
+        );
+
+        return nearbyPharmacies;
+    }
+
+    private double calculateDistance(
+            double lat1,
+            double lon1,
+            double lat2,
+            double lon2) {
+
+        final double EARTH_RADIUS_KM = 6371.0;
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+
+        double a =
+                Math.sin(latDistance / 2)
+                        * Math.sin(latDistance / 2)
+                        +
+                        Math.cos(Math.toRadians(lat1))
+                                * Math.cos(Math.toRadians(lat2))
+                                * Math.sin(lonDistance / 2)
+                                * Math.sin(lonDistance / 2);
+
+        double c =
+                2 * Math.atan2(
+                        Math.sqrt(a),
+                        Math.sqrt(1 - a)
+                );
+
+        return EARTH_RADIUS_KM * c;
     }
 }

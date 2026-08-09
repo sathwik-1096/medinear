@@ -5,6 +5,7 @@ import com.medinear.medinear.dto.BillItemResponseDto;
 import com.medinear.medinear.dto.BillRequestDto;
 import com.medinear.medinear.dto.BillResponseDto;
 import com.medinear.medinear.entity.*;
+import com.medinear.medinear.enums.BillStatus;
 import com.medinear.medinear.exception.BadRequestException;
 import com.medinear.medinear.exception.ResourceNotFoundException;
 import com.medinear.medinear.mapper.BillMapper;
@@ -131,7 +132,7 @@ public class BillServiceImpl implements BillService {
         bill.setUser(customer);
         bill.setPharmacy(pharmacy);
         bill.setPaymentMethod(request.getPaymentMethod());
-
+        bill.setBillStatus(BillStatus.PAID);
 
         bill.setBillItems(new ArrayList<>());
         // ↓↓↓ Write it here ↓↓↓
@@ -191,20 +192,32 @@ public class BillServiceImpl implements BillService {
         // More code will come here...
         bill.setTotalAmount(totalAmount);
 
-        double discount = request.getDiscount() != null ? request.getDiscount() : 0.0;
-        double tax = request.getTax() != null ? request.getTax() : 0.0;
+        double discount = request.getDiscount() != null
+                ? request.getDiscount()
+                : 0.0;
+
+        double tax = request.getTax() != null
+                ? request.getTax()
+                : 0.0;
 
         bill.setDiscount(discount);
         bill.setTax(tax);
 
         double finalAmount = totalAmount - discount + tax;
+
+        if (finalAmount < 0) {
+            throw new BadRequestException(
+                    "Final amount cannot be negative"
+            );
+        }
+
         bill.setFinalAmount(finalAmount);
 
-// Generate bill number (simple example)
         bill.setBillNumber("MED-" + System.currentTimeMillis());
 
-       Bill savedBill = billRepository.save(bill);
-       return BillMapper.toResponseDto(savedBill);
+        Bill savedBill = billRepository.save(bill);
+
+        return BillMapper.toResponseDto(savedBill);
     }
     @Override
     public void deleteBill(Long id) {

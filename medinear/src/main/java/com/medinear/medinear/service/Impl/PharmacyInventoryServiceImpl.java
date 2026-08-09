@@ -33,6 +33,49 @@ public class PharmacyInventoryServiceImpl implements PharmacyInventoryService {
 
     @Override
     public PharmacyInventory addInventory(PharmacyInventory inventory) {
+
+        // Check pharmacy
+        Pharmacy pharmacy = pharmacyRepository.findById(
+                inventory.getPharmacy().getId()
+        ).orElseThrow(() ->
+                new RuntimeException("Pharmacy not found"));
+
+        // Check medicine
+        Medicine medicine = medicineRepository.findById(
+                inventory.getMedicine().getId()
+        ).orElseThrow(() ->
+                new RuntimeException("Medicine not found"));
+
+        // Validate quantity
+        if (inventory.getAvailableQuantity() == null ||
+                inventory.getAvailableQuantity() < 0) {
+
+            throw new RuntimeException(
+                    "Available quantity cannot be negative");
+        }
+
+        // Validate price
+        if (inventory.getPrice() == null ||
+                inventory.getPrice() < 0) {
+
+            throw new RuntimeException(
+                    "Price cannot be negative");
+        }
+
+        // Prevent duplicate medicine in same pharmacy
+        Optional<PharmacyInventory> existing =
+                pharmacyInventoryRepository
+                        .findByPharmacyAndMedicine(pharmacy, medicine);
+
+        if (existing.isPresent()) {
+            throw new RuntimeException(
+                    "Medicine already exists in this pharmacy inventory");
+        }
+
+        // Use managed entities
+        inventory.setPharmacy(pharmacy);
+        inventory.setMedicine(medicine);
+
         return pharmacyInventoryRepository.save(inventory);
     }
 
@@ -46,6 +89,20 @@ public class PharmacyInventoryServiceImpl implements PharmacyInventoryService {
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Inventory not found"));
+
+        if (inventory.getAvailableQuantity() == null ||
+                inventory.getAvailableQuantity() < 0) {
+
+            throw new RuntimeException(
+                    "Available quantity cannot be negative");
+        }
+
+        if (inventory.getPrice() == null ||
+                inventory.getPrice() < 0) {
+
+            throw new RuntimeException(
+                    "Price cannot be negative");
+        }
 
         existingInventory.setAvailableQuantity(
                 inventory.getAvailableQuantity());
